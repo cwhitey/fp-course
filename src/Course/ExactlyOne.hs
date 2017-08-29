@@ -6,7 +6,7 @@ module Course.ExactlyOne where
 import qualified Control.Applicative as A
 import qualified Control.Monad as M
 import Course.Core
-import qualified Prelude as P
+import Prelude as P
 
 data ExactlyOne a = ExactlyOne a deriving (Eq, Show)
 

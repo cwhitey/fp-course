@@ -71,12 +71,8 @@ foldLeft f b (h :. t) = let b' = f b h in b' `seq` foldLeft f b' t
 -- prop> x `headOr` infinity == 0
 --
 -- prop> x `headOr` Nil == x
-headOr ::
-  a
-  -> List a
-  -> a
-headOr =
-  error "todo: Course.List#headOr"
+headOr :: a -> List a -> a
+headOr = foldRight const -- ?
 
 -- | The product of the elements of a list.
 --
@@ -88,10 +84,8 @@ headOr =
 --
 -- >>> product (1 :. 2 :. 3 :. 4 :. Nil)
 -- 24
-product ::
-  List Int
-  -> Int
-product =
+product :: List Int -> Int
+product a = foldRight + 
   error "todo: Course.List#product"
 
 -- | Sum the elements of the list.
