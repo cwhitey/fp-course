@@ -100,21 +100,21 @@ unexpectedCharParser ::
 unexpectedCharParser c =
   P (\_ -> UnexpectedChar c)
 
---- | Return a parser that always fails with the given error.
+--- | Return a parser that always returns the given parse result.
 ---
---- >>> isErrorResult (parse (failed UnexpectedEof) "abc")
+--- >>> isErrorResult (parse (constantParser UnexpectedEof) "abc")
 --- True
-failed ::
+constantParser ::
   ParseResult a
   -> Parser a
-failed =
+constantParser =
   P . const
 
 -- | A parser that produces zero or a positive integer.
 natural ::
   Parser Int
 natural =
-  bindParser (\k -> case read k of Empty  -> failed (UnexpectedString k)
+  bindParser (\k -> case read k of Empty  -> constantParser (UnexpectedString k)
                                    Full h -> valueParser h) (list1 digit)
 
 -- | Return a parser that always succeeds with the given value and consumes no input.
@@ -188,7 +188,7 @@ bindParser =
 --
 --   * if that parser fails with an error the returned parser fails with that error.
 --
--- /Tip:/ Use @bindParser@ or @flbindParser@.
+-- /Tip:/ Use @bindParser@ or @>>=@.
 --
 -- >>> parse (character >>> valueParser 'v') "abc"
 -- Result >bc< 'v'
@@ -211,13 +211,13 @@ bindParser =
 -- >>> parse (character ||| valueParser 'v') ""
 -- Result >< 'v'
 --
--- >>> parse (failed UnexpectedEof ||| valueParser 'v') ""
+-- >>> parse (constantParser UnexpectedEof ||| valueParser 'v') ""
 -- Result >< 'v'
 --
 -- >>> parse (character ||| valueParser 'v') "abc"
 -- Result >bc< 'a'
 --
--- >>> parse (failed UnexpectedEof ||| valueParser 'v') "abc"
+-- >>> parse (constantParser UnexpectedEof ||| valueParser 'v') "abc"
 -- Result >abc< 'v'
 (|||) ::
   Parser a
@@ -455,6 +455,9 @@ firstNameParser =
 --
 -- >>> parse surnameParser "Abcdef"
 -- Result >< "Abcdef"
+--
+-- >>> parse surnameParser "Abcdefghijklmnopqrstuvwxyz"
+-- Result >< "Abcdefghijklmnopqrstuvwxyz"
 --
 -- >>> isErrorResult (parse surnameParser "Abc")
 -- True
